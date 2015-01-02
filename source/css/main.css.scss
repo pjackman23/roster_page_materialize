@@ -1,0 +1,40 @@
+@import "bourbon/bourbon";
+@import "materialize/materialize";
+
+//vars
+$blue-color: #3a82a6;
+$green-color: #43b32d;
+$orange-color: #e67339;
+$purple-color: #8c4c99;
+$white-color: #FFFFFF;
+
+$nav-color: #182329;
+$nav-border-color: #242e33;
+$nav-dark-hover-color: #2d3940;
+$nav-img-color: #12171a;
+$nav-light-hover-color: #285a73;
+
+$nav-opacity: 0.95;
+$nav-border-thickness: 2px;
+
+$overlay-bg-color: #0a0c0d;
+
+$contact-blue-hover: #47a0cc;
+
+$font-stack: Segoe UI, sans-serif;
+$font-stack-p: Calibri, sans-serif;
+
+//mixins
+@mixin background-opacity($color, $opacity: 1) {
+    background: $color;
+    background: rgba($color, $opacity);
+}
+
+//core scss
+html { 
+  background: url(../img/proto-bg.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
