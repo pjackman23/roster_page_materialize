@@ -1,3 +1,8 @@
+/*!
+ * Materialize v0.94.2 (http://materializecss.com)
+ * Copyright 2014-2015 Materialize
+ * MIT License (https://raw.githubusercontent.com/Dogfalo/materialize/master/LICENSE)
+ */
 /*
  * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
  *
@@ -245,46 +250,71 @@ jQuery.extend( jQuery.easing,
     };
 
     options = $.extend(defaults, options);
-    var $this = $(this);
-    
-    var $panel_headers = $(this).find('.collapsible-header');
-  
-    if (defaults.accordion) {
 
-      $panel_headers.each(function () {
-        $(this).click(function () {
-          
-          $(this).parent().toggleClass('active');
-          if ($(this).parent().hasClass('active')){
-            $(this).siblings('.collapsible-body').stop(true,false).slideDown({ duration: 350, easing: "easeOutQuart", queue: false});
-          }
-          else{
-            $(this).siblings('.collapsible-body').stop(true,false).slideUp({ duration: 350, easing: "easeOutQuart", queue: false});
-          }
-          $panel_headers.not($(this)).parent().removeClass('active');
-          $panel_headers.not($(this)).parent().children('.collapsible-body').stop(true,false).slideUp({ duration: 350, easing: "easeOutQuart", queue: false});
-        });
-      });
 
-    }
-    else {
-      $panel_headers.each(function () {
-        $(this).click(function () {
-          $(this).parent().toggleClass('active');
-          if ($(this).parent().hasClass('active')){
-            $(this).siblings('.collapsible-body').stop(true,false).slideDown({ duration: 350, easing: "easeOutQuart", queue: false});
-          }
-          else{
-            $(this).siblings('.collapsible-body').stop(true,false).slideUp({ duration: 350, easing: "easeOutQuart", queue: false});
-          }
+    return this.each(function() {
+
+      var $this = $(this);
+
+      var $panel_headers = $(this).find('.collapsible-header');
+
+      // Accordion Open
+      function accordionOpen(object) {
+        object.parent().toggleClass('active');
+        if (object.parent().hasClass('active')){
+          object.siblings('.collapsible-body').stop(true,false).slideDown({ duration: 350, easing: "easeOutQuart", queue: false});
+        }
+        else{
+          object.siblings('.collapsible-body').stop(true,false).slideUp({ duration: 350, easing: "easeOutQuart", queue: false});
+        }
+        $panel_headers.not(object).parent().removeClass('active');
+        $panel_headers.not(object).parent().children('.collapsible-body').stop(true,false).slideUp({ duration: 350, easing: "easeOutQuart", queue: false});
+      }
+
+      // Collapsible Open
+      function collapsibleOpen(object) {
+        object.parent().toggleClass('active');
+        if (object.parent().hasClass('active')){
+          object.siblings('.collapsible-body').stop(true,false).slideDown({ duration: 350, easing: "easeOutQuart", queue: false});
+        }
+        else{
+          object.siblings('.collapsible-body').stop(true,false).slideUp({ duration: 350, easing: "easeOutQuart", queue: false});
+        }
+      }
+
+      if (defaults.accordion) {
+
+        $panel_headers.each(function () {
+          $(this).click(function () {
+            accordionOpen($(this));
+          });
         });
-      });
-    }
+
+        // Open first active
+        accordionOpen($panel_headers.filter('.active').first());
+      }
+      else {
+        $panel_headers.each(function () {
+
+          // Open any bodies that have the active class
+          if ($(this).hasClass('active')) {
+            collapsibleOpen($(this));
+          }
+
+          $(this).click(function () {
+            collapsibleOpen($(this));
+          });
+        });
+      }
+
+    });
   };
 }( jQuery ));;(function ($) {
 
   $.fn.dropdown = function (options) {
     var defaults = {
+      inDuration: 300,
+      outDuration: 225,
       constrain_width: true, // Constrains width of dropdown to the activator
       hover: true
     }
@@ -292,10 +322,9 @@ jQuery.extend( jQuery.easing,
     options = $.extend(defaults, options);
     this.each(function(){
     var origin = $(this);
-    
+
     // Dropdown menu
     var activates = $("#"+ origin.attr('data-activates'));
-    activates.hide(0);
 
     // Move Dropdown menu to body. This allows for absolute positioning to work
     if ( !(activates.parent().is($('body'))) ) {
@@ -304,17 +333,44 @@ jQuery.extend( jQuery.easing,
     }
 
 
-    /*    
+    /*
       Helper function to position and resize dropdown.
       Used in hover and click handler.
-    */    
+    */
     function placeDropdown() {
+      var dropdownRealHeight = activates.height();
       if (options.constrain_width === true) {
         activates.css('width', origin.outerWidth());
       }
-      activates.css('top', origin.offset().top);
-      activates.css('left', origin.offset().left);
-      activates.show({duration: 250, easing: 'easeOutCubic'});
+      if (elementOrParentIsFixed(origin[0])) {
+        activates.css({
+          display: 'block',
+          position: 'fixed',
+          height: 0,
+          top: origin.position().top,
+          left:origin.position().left
+        });
+      }
+      else {
+        activates.css({
+          display: 'block',
+          top: origin.offset().top,
+          left: origin.offset().left,
+          height: 0
+        });
+      }
+      activates.velocity({opacity: 1}, {duration: options.inDuration, queue: false, easing: 'easeOutQuad'})
+      .velocity(
+      {
+        height: dropdownRealHeight
+      },
+      {duration: options.inDuration,
+        queue: false,
+        easing: 'easeOutCubic',
+        complete: function(){
+          activates.css('overflow-y', 'auto')
+        }
+      });
     }
     function elementOrParentIsFixed(element) {
         var $element = $(element);
@@ -329,10 +385,7 @@ jQuery.extend( jQuery.easing,
         return isFixed;
     }
 
-    if (elementOrParentIsFixed(origin[0])) {
-      console.log('fixed it is');
-      activates.css('position', 'fixed');
-    }
+
 
 
     // Hover
@@ -341,10 +394,23 @@ jQuery.extend( jQuery.easing,
       origin.on('mouseover', function(e){ // Mouse over
         placeDropdown();
       });
-      
-      // Document click handler        
+
+      // Document click handler
       activates.on('mouseleave', function(e){ // Mouse out
-        activates.hide({duration: 175, easing: 'easeOutCubic'});
+        activates.velocity(
+          {
+            opacity: 0
+          },
+          {
+            duration: options.outDuration,
+            easing: 'easeOutQuad',
+            complete: function(){
+              activates.css({
+                display: 'none',
+                'overflow-y': ''
+              });
+            }
+          });
       });
 
     // Click
@@ -358,7 +424,19 @@ jQuery.extend( jQuery.easing,
         placeDropdown();
         $(document).bind('click.'+ activates.attr('id'), function (e) {
           if (!activates.is(e.target) && (!origin.is(e.target))) {
-            activates.hide({duration: 175, easing: 'easeOutCubic'});
+            activates.velocity({
+              opacity: 0
+            },
+            {
+              duration: options.outDuration,
+              easing: 'easeOutQuad',
+              complete: function(){
+                activates.css({
+                  display: 'none',
+                  'overflow-y': ''
+                });
+              }
+            });
             $(document).unbind('click.' + activates.attr('id'));
           }
         });
@@ -394,6 +472,13 @@ jQuery.extend( jQuery.easing,
       if (options.dismissible) {
         $("#lean-overlay").click(function() {
           $(modal).closeModal(options);
+        });
+        // Return on ESC
+        $(document).keyup(function(e) {
+          if (e.keyCode === 27) {   // ESC key
+            $(modal).closeModal(options);
+            $(this).off();
+          }
         });
       }
 
@@ -469,80 +554,80 @@ jQuery.extend( jQuery.easing,
       var overlayActive = false;
       var doneAnimating = true;
       var inDuration = 275;
-      var outDuration = 225;
+      var outDuration = 200;
       var origin = $(this);
       var placeholder = $('<div></div>').addClass('material-placeholder');
-      var originalWidth = origin.width();
-      var originalHeight = origin.height(); 
+      var originalWidth = 0;
+      var originalHeight = 0;
 
       origin.wrap(placeholder);
       origin.on('click', function(){
-        
 
+        var placeholder = origin.parent('.material-placeholder');
         var windowWidth = window.innerWidth;
         var windowHeight = window.innerHeight;
-        
-        // If already modal, do nothing
-        if (overlayActive || doneAnimating === false) {
+        var originalWidth = origin.width();
+        var originalHeight = origin.height();
+
+        // If already modal, return to original
+        if (doneAnimating === false) {
+          return false;
+        }
+        else if (overlayActive && doneAnimating===true) {
           returnToOriginal();
           return false;
         }
-        origin.stop();
-        $('#materialbox-overlay').stop(true, true, true);
 
-
-        // Stop ongoing animation
-        // origin.stop( {jumpToEnd: true} );
-
-        // add active class
+        // Set states
+        doneAnimating = false;
         origin.addClass('active');
-        originalWidth = origin.width();
-        originalHeight = origin.height();
+        overlayActive = true;
 
-        
         // Set positioning for placeholder
-        origin.parent('.material-placeholder').css('width', origin.innerWidth())
-          .css('height', originalHeight)
-          .css('position', 'relative')
-          .css('top', 0)
-          .css('left', 0);
 
-        
-        origin.css('position', 'absolute');
+        placeholder.css({
+          width: placeholder[0].getBoundingClientRect().width,
+          height: placeholder[0].getBoundingClientRect().height,
+          position: 'relative',
+          top: 0,
+          left: 0
+        })
 
-        // Add caption if it exists
+        // Set css on origin
+        origin.css({position: 'absolute', 'z-index': 1000})
+        .data('width', originalWidth)
+        .data('height', originalHeight);
+
+        // Add overlay
+        var overlay = $('<div id="materialbox-overlay"></div>')
+          .css({
+            opacity: 0
+          })
+          .click(function(){
+            if (doneAnimating === true)
+            returnToOriginal();
+          });
+          // Animate Overlay
+          $('body').append(overlay);
+          overlay.velocity({opacity: 1}, {duration: inDuration, queue: false, easing: 'easeOutQuad'}
+            );
+
+
+        // Add and animate caption if it exists
         if (origin.data('caption') !== "") {
           var $photo_caption = $('<div class="materialbox-caption"></div');
           $photo_caption.text(origin.data('caption'));
           $('body').append($photo_caption);
+          $photo_caption.css({ "display": "inline" });
+          $photo_caption.velocity({opacity: 1}, {duration: inDuration, queue: false, easing: 'easeOutQuad'})
         }
 
-        // Add overlay
-        var overlay = $('<div></div>');
-        overlay.attr('id', 'materialbox-overlay')
-          .css('width', $(document).width() + 100) // account for any scrollbar
-          .css('height', $(document).height() + 100) // account for any scrollbar
-          .css('top', 0)
-          .css('left', 0)
-          .css('opacity', 0)
-          .css('will-change', 'opacity')
-          .click(function(){
-            returnToOriginal();
-          });
-        $('body').append(overlay);
-        overlay.animate({opacity: 1}, {duration: inDuration, queue: false, easing: 'easeOutQuad'}
-        );
-        
-        // Set states
-        overlayActive = true;
-        doneAnimating = false;
 
-        
-        // Resize Image      
+
+        // Resize Image
         var ratio = 0;
         var widthPercent = originalWidth / windowWidth;
         var heightPercent = originalHeight / windowHeight;
-        
         var newWidth = 0;
         var newHeight = 0;
 
@@ -557,87 +642,134 @@ jQuery.extend( jQuery.easing,
           newHeight = windowHeight * 0.9;
         }
 
-        // Animate caption
-        if (origin.data('caption') !== "") {
-          $photo_caption.css({ "display": "inline" });
-          $photo_caption.velocity({opacity: 1}, {duration: inDuration, queue: false, easing: 'easeOutQuad'})
-        }
-
-        // Reposition Element AND Animate image + set z-index
-        origin.css('z-index', 1000)
-        .css('will-change', 'left, top')
+        // Animate image + set z-index
         if(origin.hasClass('responsive-img')) {
-          origin.velocity({'max-width': newWidth, 'width': originalWidth}, {duration: 0, queue: false, 
+          origin.velocity({'max-width': newWidth, 'width': originalWidth}, {duration: 0, queue: false,
             complete: function(){
-              origin.css('left', 0)
-                .css('top', 0)
-                
-                .velocity({ height: newHeight, width: newWidth }, {duration: inDuration, queue: false, easing: 'easeOutQuad'})
-                .velocity({ left: $(document).scrollLeft() + windowWidth/2 - origin.parent('.material-placeholder').offset().left - newWidth/2 }, {duration: inDuration, queue: false, easing: 'easeOutQuad'})
-                .velocity({ top: $(document).scrollTop() + windowHeight/2 - origin.parent('.material-placeholder').offset().top - newHeight/ 2}, {duration: inDuration, queue: false, easing: 'easeOutQuad', complete: function(){doneAnimating = true;} });
-            }
-          });
+              origin.css({left: 0, top: 0})
+              .velocity(
+                {
+                  height: newHeight,
+                  width: newWidth,
+                  left: $(document).scrollLeft() + windowWidth/2 - origin.parent('.material-placeholder').offset().left - newWidth/2,
+                  top: $(document).scrollTop() + windowHeight/2 - origin.parent('.material-placeholder').offset().top - newHeight/ 2
+                },
+                {
+                  duration: inDuration,
+                  queue: false,
+                  easing: 'easeOutQuad',
+                  complete: function(){doneAnimating = true;}
+                }
+              );
+            } // End Complete
+          }); // End Velocity
         }
         else {
           origin.css('left', 0)
-            .css('top', 0)
-            .velocity({ height: newHeight, width: newWidth }, {duration: inDuration, queue: false, easing: 'easeOutQuad'})
-            .velocity({ left: $(document).scrollLeft() + windowWidth/2 - origin.parent('.material-placeholder').offset().left - newWidth/2 }, {duration: inDuration, queue: false, easing: 'easeOutQuad'})
-            .velocity({ top: $(document).scrollTop() + windowHeight/2 - origin.parent('.material-placeholder').offset().top - newHeight/ 2}, {duration: inDuration, queue: false, easing: 'easeOutQuad', complete: function(){doneAnimating = true;} });
+          .css('top', 0)
+          .velocity(
+            {
+              height: newHeight,
+              width: newWidth,
+              left: $(document).scrollLeft() + windowWidth/2 - origin.parent('.material-placeholder').offset().left - newWidth/2,
+              top: $(document).scrollTop() + windowHeight/2 - origin.parent('.material-placeholder').offset().top - newHeight/ 2
+            },
+            {
+              duration: inDuration,
+              queue: false,
+              easing: 'easeOutQuad',
+              complete: function(){doneAnimating = true;}
+            }
+            ); // End Velocity
         }
 
+    }); // End origin on click
 
 
-        }); // End origin on click
-
-      
       // Return on scroll
       $(window).scroll(function() {
-        if (overlayActive) {
-          returnToOriginal();    
+        if (overlayActive ) {
+          returnToOriginal();
         }
       });
-      
+
       // Return on ESC
       $(document).keyup(function(e) {
 
-        if (e.keyCode === 27) {   // ESC key
+        if (e.keyCode === 27 && doneAnimating === true) {   // ESC key
           if (overlayActive) {
-            returnToOriginal();    
+            returnToOriginal();
           }
         }
       });
-      
-      
+
+
       // This function returns the modaled image to the original spot
       function returnToOriginal() {
-          // Reset z-index
-          var original_z_index = origin.parent('.material-placeholder').attr('z-index');
-          if (!original_z_index) {
-            original_z_index = 0;
-          }
-          // Remove Overlay
-          overlayActive = false;
-          $('#materialbox-overlay').fadeOut(outDuration, function(){ 
-            $(this).remove(); 
-            origin.css('z-index', original_z_index);
+
+          doneAnimating = false;
+
+          var placeholder = origin.parent('.material-placeholder');
+          var windowWidth = window.innerWidth;
+          var windowHeight = window.innerHeight;
+          var originalWidth = origin.data('width');
+          var originalHeight = origin.data('height');
+
+
+          $('#materialbox-overlay').fadeOut(outDuration, function(){
+            // Remove Overlay
+            overlayActive = false;
+            $(this).remove();
           });
-          // Resize
-          origin.velocity({ width: originalWidth}, {duration: outDuration, queue: false, easing: 'easeOutQuad'});
-          origin.velocity({ height: originalHeight}, {duration: outDuration, queue: false, easing: 'easeOutQuad'});
 
-          // Reposition Element
-          origin.velocity({ left: 0}, {duration: outDuration, queue: false, easing: 'easeOutQuad'});
-          origin.velocity({ top: 0 }, {duration: outDuration, queue: false, easing: 'easeOutQuad'});
-          origin.css('will-change', '');
-          // add active class
-          origin.removeClass('active');
+          // Resize Image
+          origin.velocity(
+            {
+              width: originalWidth,
+              height: originalHeight,
+              left: 0,
+              top: 0
+            },
+            {
+              duration: outDuration,
+              queue: false, easing: 'easeOutQuad'
+            }
+          );
 
-          // Remove Caption
-          $('.materialbox-caption').velocity({opacity: 0}, {duration: outDuration, queue: false, easing: 'easeOutQuad', complete: function(){$(this).remove();}});
-      }
-    });
-  };
+          // Remove Caption + reset css settings on image
+          $('.materialbox-caption').velocity({opacity: 0}, {
+            duration: outDuration + 200, // Delay prevents animation overlapping
+            queue: false, easing: 'easeOutQuad',
+            complete: function(){
+              placeholder.css({
+                height: '',
+                width: '',
+                position: '',
+                top: '',
+                left: ''
+              });
+
+              origin.css({
+                height: '',
+                position: '',
+                top: '',
+                left: '',
+                width: '',
+                'max-width': '',
+                position: '',
+                'z-index': ''
+              });
+
+              // Remove class
+              origin.removeClass('active');
+              doneAnimating = true;
+              $(this).remove();
+            }
+          });
+
+        }
+        });
+};
 }( jQuery ));;(function ($) {
 
     $.fn.parallax = function () {
@@ -683,7 +815,7 @@ jQuery.extend( jQuery.easing,
 
     };
 }( jQuery ));;(function ($) {
-    
+
   $.fn.tabs = function () {
 
     return this.each(function() {
@@ -703,10 +835,19 @@ jQuery.extend( jQuery.easing,
         $tabs_width = $this.width(),
         $tab_width = $this.find('li').first().outerWidth(),
         $index = 0;
-    
+
     // If the location.hash matches one of the links, use that as the active tab.
-    // If no match is found, use the first link as the initial active tab.
-    $active = $($links.filter('[href="'+location.hash+'"]')[0] || $links[0]);
+    // console.log($(".tabs .tab a[href='#tab3']"));
+    $active = $($links.filter('[href="'+location.hash+'"]'));
+
+    // If no match is found, use the first link or any with class 'active' as the initial active tab.
+    if ($active.length === 0) {
+        $active = $(this).find('li.tab a.active').first();
+    }
+    if ($active.length === 0) {
+      $active = $(this).find('li.tab a').first();
+    }
+
     $active.addClass('active');
     $index = $links.index($active);
     if ($index < 0) {
@@ -714,7 +855,7 @@ jQuery.extend( jQuery.easing,
     }
 
     $content = $($active[0].hash);
-    
+
     // append indicator then set indicator width to tab width
     $this.append('<div class="indicator"></div>');
     var $indicator = $this.find('.indicator');
@@ -724,10 +865,10 @@ jQuery.extend( jQuery.easing,
     }
     $(window).resize(function () {
       $tabs_width = $this.width();
-      $tab_width = $this.find('li').first().outerWidth();    
+      $tab_width = $this.find('li').first().outerWidth();
       if ($index < 0) {
         $index = 0;
-      }  
+      }
       if ($tab_width !== 0 && $tabs_width !== 0) {
         $indicator.css({"right": $tabs_width - (($index + 1) * $tab_width)});
         $indicator.css({"left": $index * $tab_width});
@@ -738,7 +879,8 @@ jQuery.extend( jQuery.easing,
     $links.not($active).each(function () {
       $(this.hash).hide();
     });
-    
+
+
     // Bind the click event handler
     $this.on('click', 'a', function(e){
       $tabs_width = $this.width();
@@ -747,12 +889,12 @@ jQuery.extend( jQuery.easing,
       // Make the old tab inactive.
       $active.removeClass('active');
       $content.hide();
-    
+
       // Update the variables with the new link and content
       $active = $(this);
       $content = $(this.hash);
       $links = $this.find('li.tab a');
-    
+
       // Make the tab active.
       $active.addClass('active');
       var $prev_index = $index;
@@ -762,7 +904,7 @@ jQuery.extend( jQuery.easing,
       }
       // Change url to current tab
 //      window.location.hash = $active.attr('href');
-      
+
       $content.show();
 
       // Update indicator
@@ -775,7 +917,7 @@ jQuery.extend( jQuery.easing,
         $indicator.velocity({"left": $index * $tab_width}, { duration: 300, queue: false, easing: 'easeOutQuad'});
         $indicator.velocity({"right": $tabs_width - (($index + 1) * $tab_width)}, {duration: 300, queue: false, easing: 'easeOutQuad', delay: 80});
       }
-    
+
       // Prevent the anchor's default click action
       e.preventDefault();
     });
@@ -939,11 +1081,11 @@ jQuery.extend( jQuery.easing,
 }( jQuery ));;
 /*!
  * Waves v0.5.3
- * http://fian.my.id/Waves 
- * 
- * Copyright 2014 Alfiana E. Sibuea and other contributors 
- * Released under the MIT license 
- * https://github.com/fians/Waves/blob/master/LICENSE 
+ * http://fian.my.id/Waves
+ *
+ * Copyright 2014 Alfiana E. Sibuea and other contributors
+ * Released under the MIT license
+ * https://github.com/fians/Waves/blob/master/LICENSE
  */
 
 ;(function(window) {
@@ -998,12 +1140,12 @@ jQuery.extend( jQuery.easing,
         duration: 700,
 
         show: function(e) {
-            
+
             // Disable right click
             if (e.button === 2) {
               return false;
             }
-          
+
             var el = this;
 
             // Create ripple
@@ -1016,7 +1158,7 @@ jQuery.extend( jQuery.easing,
             var relativeY   = (e.pageY - pos.top);
             var relativeX   = (e.pageX - pos.left);
             var scale       = 'scale('+((el.clientWidth / 100) * 22)+')';
-          
+
             // Support for touch devices
             if ('touches' in e) {
               relativeY   = (e.touches[0].pageY - pos.top);
@@ -1034,7 +1176,7 @@ jQuery.extend( jQuery.easing,
                 'top': relativeY+'px',
                 'left': relativeX+'px'
             };
-            
+
             ripple.className = ripple.className + ' waves-notransition';
             ripple.setAttribute('style', convertStyle(rippleStyle));
             ripple.className = ripple.className.replace('waves-notransition', '');
@@ -1062,11 +1204,11 @@ jQuery.extend( jQuery.easing,
         },
 
         hide: function() {
-            
+
             var el = this;
 
             var width = el.clientWidth * 1.4;
-            
+
             // Get first ripple
             var ripple = null;
 
@@ -1125,7 +1267,7 @@ jQuery.extend( jQuery.easing,
                         return false;
                     }
 
-                    
+
                 }, Effect.duration);
 
             }, delay);
@@ -1159,7 +1301,7 @@ jQuery.extend( jQuery.easing,
                     }
 
                     wrapper.setAttribute('style', elementStyle);
-                    
+
                     el.className = 'waves-button-input';
                     el.removeAttribute('style');
 
@@ -1168,7 +1310,7 @@ jQuery.extend( jQuery.easing,
                     wrapper.appendChild(el);
 
                 }
-                
+
             }
         }
     };
@@ -1180,7 +1322,7 @@ jQuery.extend( jQuery.easing,
         if ('duration' in options) {
             Effect.duration = options.duration;
         }
-        
+
         //Wrap input inside <i> tag
         Effect.wrapInput($$('.waves-effect'));
 
@@ -1190,11 +1332,12 @@ jQuery.extend( jQuery.easing,
           i.addEventListener('mouseup', Effect.hide, false);                      i.addEventListener('touchstart', Effect.show, false);
           i.addEventListener('mouseleave', Effect.hide, false);                   i.addEventListener('touchend',   Effect.hide, false);
           i.addEventListener('touchcancel',   Effect.hide, false);
-        } else {
-          i.addEventListener('mousedown', Effect.show, false);
-          i.addEventListener('mouseup', Effect.hide, false);
-          i.addEventListener('mouseleave', Effect.hide, false);
         }
+
+        i.addEventListener('mousedown', Effect.show, false);
+        i.addEventListener('mouseup', Effect.hide, false);
+        i.addEventListener('mouseleave', Effect.hide, false);
+
 
         });
 
@@ -1343,7 +1486,6 @@ jQuery.extend( jQuery.easing,
 
     $.fn.sideNav = function (options) {
       var defaults = {
-        menuWidth: 240,
         activationWidth: 70,
         edge: 'left'
       }
@@ -1352,8 +1494,21 @@ jQuery.extend( jQuery.easing,
       $(this).each(function(){
         var $this = $(this);
         var menu_id = $("#"+ $this.attr('data-activates'));
+        var menuWidth = menu_id.width();
+
         if (options.edge != 'left') {
-          menu_id.addClass('right');
+          menu_id.addClass('right-aligned');
+        }
+
+        // Window resize to reset on large screens fixed
+        if (menu_id.hasClass('fixed')) {
+          $(window).resize( function() {
+            if ($(window).width() > 1200) {
+              if (menu_id.attr('style')) {
+                menu_id.removeAttr('style');
+              }
+            }
+          });
         }
 
         function removeMenu() {
@@ -1361,12 +1516,12 @@ jQuery.extend( jQuery.easing,
             complete: function() {
               $(this).remove();
             } });
-
           if (options.edge === 'left') {
-            menu_id.velocity({left: -1 * (options.menuWidth + 10)}, {duration: 300, queue: false, easing: 'easeOutQuad'});
+
+            menu_id.velocity({left: -1 * (menuWidth + 10)}, {duration: 300, queue: false, easing: 'easeOutQuad'});
           }
           else {
-            menu_id.velocity({right: -1 * (options.menuWidth + 10)}, {duration: 300, queue: false, easing: 'easeOutQuad'});
+            menu_id.velocity({right: -1 * (menuWidth + 10)}, {duration: 300, queue: false, easing: 'easeOutQuad'});
           }
           enable_scroll();
         }
@@ -1395,10 +1550,10 @@ jQuery.extend( jQuery.easing,
                   removeMenu();
 
                   if (options.edge === 'left') {
-                    menu_id.velocity({left: -1 * options.menuWidth}, {duration: 300, queue: false, easing: 'easeOutQuad'});
+                    menu_id.velocity({left: -1 * menuWidth}, {duration: 300, queue: false, easing: 'easeOutQuad'});
                   }
                   else {
-                    menu_id.velocity({right: -1 * options.menuWidth}, {duration: 300, queue: false, easing: 'easeOutQuad'});
+                    menu_id.velocity({right: -1 * menuWidth}, {duration: 300, queue: false, easing: 'easeOutQuad'});
                   }
                   overlay.animate({opacity: 0}, {duration: 300, queue: false, easing: 'easeOutQuad',
                     complete: function() {
@@ -1411,25 +1566,25 @@ jQuery.extend( jQuery.easing,
               }
 
 
-              if (x > options.menuWidth) { x = options.menuWidth; }
+              if (x > menuWidth) { x = menuWidth; }
               else if (x < 0) { x = 0; }
-              else if (x < (options.menuWidth / 2)) { menuOut = false; }
-              else if (x >= (options.menuWidth / 2)) { menuOut = true; }
+              else if (x < (menuWidth / 2)) { menuOut = false; }
+              else if (x >= (menuWidth / 2)) { menuOut = true; }
 
               if (options.edge === 'left') {
-                menu_id.velocity({left: (-1 * options.menuWidth) + x}, {duration: 50, queue: false, easing: 'easeOutQuad'});
+                menu_id.velocity({left: (-1 * menuWidth) + x}, {duration: 50, queue: false, easing: 'easeOutQuad'});
               }
               else {
-                menu_id.velocity({right: (-1 * options.menuWidth) + x}, {duration: 50, queue: false, easing: 'easeOutQuad'});
+                menu_id.velocity({right: (-1 * menuWidth) + x}, {duration: 50, queue: false, easing: 'easeOutQuad'});
               }
 
                 // Percentage overlay
-                var overlayPerc = x / options.menuWidth;
+                var overlayPerc = x / menuWidth;
                 $('#sidenav-overlay').velocity({opacity: overlayPerc }, {duration: 50, queue: false, easing: 'easeOutQuad'});
               }
               else {
                 if (menuOut) {
-                  if ((e.gesture.center.x > (options.menuWidth - options.activationWidth)) && direction === 2) {
+                  if ((e.gesture.center.x > (menuWidth - options.activationWidth)) && direction === 2) {
                     panning = true;
                   }
                 }
@@ -1790,7 +1945,7 @@ jQuery.extend( jQuery.easing,
 
     // Text based inputs
     var input_selector = 'input[type=text], input[type=password], input[type=email], textarea';
-    
+
     $(input_selector).each(function(){
       if($(this).val().length !== 0) {
        $(this).siblings('label, i').addClass('active');
@@ -1804,12 +1959,12 @@ jQuery.extend( jQuery.easing,
     $(document).on('blur', input_selector, function () {
       console.log($(this).is(':valid'));
       if ($(this).val().length === 0) {
-        $(this).siblings('label, i').removeClass('active');     
+        $(this).siblings('label, i').removeClass('active');
 
         if ($(this).hasClass('validate')) {
-          $(this).removeClass('valid');          
-          $(this).removeClass('invalid');                 
-        } 
+          $(this).removeClass('valid');
+          $(this).removeClass('invalid');
+        }
       }
       else {
         if ($(this).hasClass('validate')) {
@@ -1819,9 +1974,9 @@ jQuery.extend( jQuery.easing,
           }
           else {
             $(this).removeClass('valid');
-            $(this).addClass('invalid');         
-          }                          
-        } 
+            $(this).addClass('invalid');
+          }
+        }
       }
     });
 
@@ -1854,7 +2009,7 @@ jQuery.extend( jQuery.easing,
     });
 
     var range_wrapper = '.range-field';
-    
+
       $(document).on("mousedown", range_wrapper, function(e) {
         var thumb = $(this).children('.thumb');
         if (thumb.length <= 0) {
@@ -1866,7 +2021,7 @@ jQuery.extend( jQuery.easing,
       $(this).addClass('active');
 
       if (!thumb.hasClass('active')) {
-        thumb.velocity({ height: "30px", width: "30px", top: "-20px", marginLeft: "-15px"}, { duration: 300, easing: 'easeOutExpo' });  
+        thumb.velocity({ height: "30px", width: "30px", top: "-20px", marginLeft: "-15px"}, { duration: 300, easing: 'easeOutExpo' });
       }
       var left = e.pageX - $(this).offset().left;
       var width = $(this).outerWidth();
@@ -1878,8 +2033,8 @@ jQuery.extend( jQuery.easing,
         left = width;
       }
       thumb.addClass('active').css('left', left);
-      thumb.find('.value').html($(this).children('input[type=range]').val());   
-   
+      thumb.find('.value').html($(this).children('input[type=range]').val());
+
     });
     $(document).on("mouseup", range_wrapper, function() {
       range_mousedown = false;
@@ -1891,7 +2046,7 @@ jQuery.extend( jQuery.easing,
       var thumb = $(this).children('.thumb');
       if (range_mousedown) {
         if (!thumb.hasClass('active')) {
-          thumb.velocity({ height: "30px", width: "30px", top: "-20px", marginLeft: "-15px"}, { duration: 300, easing: 'easeOutExpo' });  
+          thumb.velocity({ height: "30px", width: "30px", top: "-20px", marginLeft: "-15px"}, { duration: 300, easing: 'easeOutExpo' });
         }
         var left = e.pageX - $(this).offset().left;
         var width = $(this).outerWidth();
@@ -1903,9 +2058,9 @@ jQuery.extend( jQuery.easing,
           left = width;
         }
         thumb.addClass('active').css('left', left);
-        thumb.find('.value').html($(this).children('input[type=range]').val());   
+        thumb.find('.value').html($(this).children('input[type=range]').val());
       }
-      
+
     });
     $(document).on("mouseout", range_wrapper, function() {
       if (!range_mousedown) {
@@ -1936,13 +2091,19 @@ jQuery.extend( jQuery.easing,
         var wrapper = $('<div class="select-wrapper"></div>');
         var options = $('<ul id="select-options-' + uniqueID+'" class="dropdown-content select-dropdown"></ul>');
         var selectOptions = $select.children('option');
-        var label = selectOptions.first();
+        if ($select.find('option:selected') !== undefined) {
+          var label = $select.find('option:selected');
+        }
+        else {
+          var label = $select.find('option:disabled');
+        }
 
 
         // Create Dropdown structure
         selectOptions.each(function () {
           // Add disabled attr if disabled
-          options.append($('<li class="' + (($(this).is(':disabled')) ? 'disabled' : '') + '"><span>' + $(this).html() + '</span></li>'));
+          options.append($('<li class="' + (($(this).is(':disabled')) ? 'disabled' : '') + '"><a class="waves-effect' + (($(this).is(':disabled')) ? ' disabled' : '') + '" href="#">' + $(this).html() + '</a></li>'));
+          options.append($('<li class="divider"></li>'));
         });
 
 
@@ -1952,27 +2113,31 @@ jQuery.extend( jQuery.easing,
             // Check if option element is disabled
             if (!$(this).hasClass('disabled')) {
               $curr_select.find('option').eq(i).prop('selected', true);
+              $(".select-wrapper span.select-dropdown").css("color", "rgba(0, 0, 0, 0.87)");
+              $(".select-wrapper span.select-dropdown").css("font-weight", "500");
+              // Trigger onchange() event
+              if (typeof($curr_select.context.onchange) === "function") {
+                $curr_select[0].onchange();
+              }
               $curr_select.prev('span.select-dropdown').html($(this).text());
             }
           });
+
         });
 
         // Wrap Elements
         $select.wrap(wrapper);
-
         // Add Select Display Element
-        var $newSelect = $('<span class="select-dropdown ' + (($select.is(':disabled')) ? 'disabled' : '') 
+        var $newSelect = $('<span class="select-dropdown ' + (($select.is(':disabled')) ? 'disabled' : '')
                          + '" data-activates="select-options-' + uniqueID +'">' + label.html() + '</span>');
         $select.before($newSelect);
         $('body').append(options);
-
         // Check if section element is disabled
         if (!$select.is(':disabled')) {
           $newSelect.dropdown({"hover": false});
         }
-
         $select.addClass('initialized');
-
+        
       });
     }
 
@@ -2343,7 +2508,7 @@ jQuery.extend( jQuery.easing,
 
   });
 }( jQuery ));;/*!
- * pickadate.js v3.5.4, 2014/09/11
+ * pickadate.js v3.5.0, 2014/04/13
  * By Amsul, http://amsul.ca
  * Hosted on http://amsul.github.io/pickadate.js
  * Licensed under MIT
@@ -2788,7 +2953,7 @@ function PickerConstructor( ELEMENT, NAME, COMPONENT, OPTIONS ) {
                     if ( P._hidden ) {
                         return P._hidden.value
                     }
-                    thing = value
+                    thing = 'value'
                 }
 
                 // Return the value, if that.
@@ -2971,7 +3136,7 @@ function PickerConstructor( ELEMENT, NAME, COMPONENT, OPTIONS ) {
             haspopup: true,
             expanded: false,
             readonly: false,
-            owns: ELEMENT.id + '_root' + (P._hidden ? ' ' + P._hidden.id : '')
+            owns: ELEMENT.id + '_root'
         })
     }
 
@@ -3010,7 +3175,7 @@ function PickerConstructor( ELEMENT, NAME, COMPONENT, OPTIONS ) {
                         //   prevent cases where focus is shifted onto external elements
                         //   when using things like jQuery mobile or MagnificPopup (ref: #249 & #120).
                         //   Also, for Firefox, don’t prevent action on the `option` element.
-                        if ( event.type == 'mousedown' && !$( target ).is( ':input' ) && target.nodeName != 'OPTION' ) {
+                        if ( event.type == 'mousedown' && !$( target ).is( 'input, select, textarea, button, option' )) {
 
                             event.preventDefault()
 
@@ -3059,7 +3224,7 @@ function PickerConstructor( ELEMENT, NAME, COMPONENT, OPTIONS ) {
 
                 // If something is picked, set `select` then close with focus.
                 else if ( !targetDisabled && 'pick' in targetData ) {
-                    P.set( 'select', targetData.pick ).close( true )
+                    P.set( 'select', targetData.pick )
                 }
 
                 // If a “clear” button is pressed, empty the values and close with focus.
@@ -3119,10 +3284,12 @@ function PickerConstructor( ELEMENT, NAME, COMPONENT, OPTIONS ) {
                 P._hidden.value = ELEMENT.value ?
                     P.get('select', SETTINGS.formatSubmit) :
                     ''
-            }).
+            })
 
-            // Insert the hidden input after the element.
-            after(P._hidden)
+
+        // Insert the hidden input as specified in the settings.
+        if ( SETTINGS.container ) $( SETTINGS.container ).append( P._hidden )
+        else $ELEMENT.after( P._hidden )
     }
 
 
@@ -3463,10 +3630,8 @@ return PickerConstructor
 }));
 
 
-
-;
-/*!
- * Date picker for pickadate.js v3.5.4
+;/*!
+ * Date picker for pickadate.js v3.5.0
  * http://amsul.github.io/pickadate.js/date.htm
  */
 
@@ -3474,7 +3639,7 @@ return PickerConstructor
 
     // AMD.
     if ( typeof define == 'function' && define.amd )
-        define( ['picker','jquery'], factory )
+        define( ['picker', 'jquery'], factory )
 
     // Node.js/browserify.
     else if ( typeof exports == 'object' )
@@ -3493,23 +3658,6 @@ var DAYS_IN_WEEK = 7,
     WEEKS_IN_CALENDAR = 6,
     _ = Picker._
 
-
-/**
- * Local date comparison helpers
- */
-var timezoneOffset = new Date().getTimezoneOffset()
-var timezoneOffsetMS = timezoneOffset * 60 * 1000
-var isLocalDateSame = function(relative, absolute) {
-    return relative.getDate() === absolute.getUTCDate() &&
-        relative.getMonth() === absolute.getUTCMonth() &&
-        relative.getFullYear() === absolute.getUTCFullYear()
-}
-var isLocalDateLessThan = function(one, two) {
-    return new Date(one.year, one.month, one.date) < new Date(two.year, two.month, two.date)
-}
-var isLocalDateGreaterThan = function(one, two) {
-    return new Date(one.year, one.month, one.date) > new Date(two.year, two.month, two.date)
-}
 
 
 /**
@@ -3585,7 +3733,7 @@ function DatePicker( picker, settings ) {
         37: function() { return isRTL() ? 1 : -1 }, // Left
         go: function( timeChange ) {
             var highlightedObject = calendar.item.highlight,
-                targetDate = new Date(highlightedObject.year, highlightedObject.month, highlightedObject.date + timeChange)
+                targetDate = new Date( highlightedObject.year, highlightedObject.month, highlightedObject.date + timeChange )
             calendar.set(
                 'highlight',
                 targetDate,
@@ -3685,57 +3833,48 @@ DatePicker.prototype.get = function( type ) {
  */
 DatePicker.prototype.create = function( type, value, options ) {
 
-    options = options || {}
+    var isInfiniteValue,
+        calendar = this
 
     // If there’s no value, use the type as the value.
     value = value === undefined ? type : value
 
-    // If it’s infinite, return that.
+
+    // If it’s infinity, update the value.
     if ( value == -Infinity || value == Infinity ) {
-        return {
-            year: value,
-            month: value,
-            date: value,
-            day: value,
-            obj: value,
-            pick: value
-        }
+        isInfiniteValue = value
     }
 
-    // If it’s a literal `true`, set it to today.
-    if ( value === true ) {
-        value = new Date()
-        if ( options.rel ) {
-            value.setDate(value.getDate() + options.rel)
-        }
+    // If it’s an object, use the native date object.
+    else if ( $.isPlainObject( value ) && _.isInteger( value.pick ) ) {
+        value = value.obj
     }
 
-    // If it’s an object, create an array out of it.
-    else if ( $.isPlainObject(value) && _.isInteger(value.pick) ) {
-        value = [value.year, value.month, value.date]
+    // If it’s an array, convert it into a date and make sure
+    // that it’s a valid date – otherwise default to today.
+    else if ( $.isArray( value ) ) {
+        value = new Date( value[ 0 ], value[ 1 ], value[ 2 ] )
+        value = _.isDate( value ) ? value : calendar.create().obj
     }
 
-    // If it’s an array, create a date.
-    if ( Array.isArray(value) ) {
-        value = new Date(value[0], value[1], value[2])
+    // If it’s a number or date object, make a normalized date.
+    else if ( _.isInteger( value ) || _.isDate( value ) ) {
+        value = calendar.normalize( new Date( value ), options )
     }
 
-    // Now it’s either a date or an integer. So create a new date.
-    value = new Date(value)
+    // If it’s a literal true or any other case, set it to now.
+    else /*if ( value === true )*/ {
+        value = calendar.now( type, value, options )
+    }
 
-    // Update the hours based on the timezone offset
-    value.setHours(-timezoneOffset / 60, -timezoneOffset % 60, 0, 0)
-
-    // Create another new date by updating by the offset.
-    value = new Date(value.getTime() + timezoneOffsetMS)
-
+    // Return the compiled object.
     return {
-        year: value.getFullYear(),
-        month: value.getMonth(),
-        date: value.getDate(),
-        day: value.getDay(),
-        obj: value,
-        pick: value.getTime()
+        year: isInfiniteValue || value.getFullYear(),
+        month: isInfiniteValue || value.getMonth(),
+        date: isInfiniteValue || value.getDate(),
+        day: isInfiniteValue || value.getDay(),
+        obj: isInfiniteValue || value,
+        pick: isInfiniteValue || value.getTime()
     }
 } //DatePicker.prototype.create
 
@@ -3805,8 +3944,12 @@ DatePicker.prototype.overlapRanges = function( one, two ) {
 /**
  * Get the date today.
  */
-DatePicker.prototype.now = function(/* type, value, options */) {
-    return true
+DatePicker.prototype.now = function( type, value, options ) {
+    value = new Date()
+    if ( options && options.rel ) {
+        value.setDate( value.getDate() + options.rel )
+    }
+    return this.normalize( value, options )
 }
 
 
@@ -3821,8 +3964,8 @@ DatePicker.prototype.navigate = function( type, value, options ) {
         targetDate,
         isTargetArray = $.isArray( value ),
         isTargetObject = $.isPlainObject( value ),
-        viewsetObject = this.item.view,
-        safety = 100
+        viewsetObject = this.item.view/*,
+        safety = 100*/
 
 
     if ( isTargetArray || isTargetObject ) {
@@ -3852,12 +3995,12 @@ DatePicker.prototype.navigate = function( type, value, options ) {
 
         // If the month we’re going to doesn’t have enough days,
         // keep decreasing the date until we reach the month’s last date.
-        while ( safety && new Date( targetYear, targetMonth, targetDate ).getMonth() !== targetMonth ) {
+        while ( /*safety &&*/ new Date( targetYear, targetMonth, targetDate ).getMonth() !== targetMonth ) {
             targetDate -= 1
-            safety -= 1
+            /*safety -= 1
             if ( !safety ) {
                 throw 'Fell into an infinite loop while navigating to ' + new Date( targetYear, targetMonth, targetDate ) + '.'
-            }
+            }*/
         }
 
         value = [ targetYear, targetMonth, targetDate ]
@@ -3868,11 +4011,18 @@ DatePicker.prototype.navigate = function( type, value, options ) {
 
 
 /**
+ * Normalize a date by setting the hours to midnight.
+ */
+DatePicker.prototype.normalize = function( value/*, options*/ ) {
+    value.setHours( 0, 0, 0, 0 )
+    return value
+}
+
+
+/**
  * Measure the range of dates.
  */
-DatePicker.prototype.measure = function( type, value, options ) {
-
-    options = options || {}
+DatePicker.prototype.measure = function( type, value/*, options*/ ) {
 
     var calendar = this
 
@@ -3888,8 +4038,7 @@ DatePicker.prototype.measure = function( type, value, options ) {
 
     // If it's an integer, get a date relative to today.
     else if ( _.isInteger( value ) ) {
-        options.rel = value
-        value = true
+        value = calendar.now( type, value, { rel: value } )
     }
 
     return value
@@ -3942,9 +4091,9 @@ DatePicker.prototype.validate = function( type, dateObject, options ) {
 
             // Return only integers for enabled weekdays.
             return _.isInteger( value )
-        }).length,
+        }).length/*,
 
-        safety = 100
+        safety = 100*/
 
 
 
@@ -3973,12 +4122,12 @@ DatePicker.prototype.validate = function( type, dateObject, options ) {
 
 
         // Keep looping until we reach an enabled date.
-        while ( safety && calendar.disabled( dateObject ) ) {
+        while ( /*safety &&*/ calendar.disabled( dateObject ) ) {
 
-            safety -= 1
+            /*safety -= 1
             if ( !safety ) {
                 throw 'Fell into an infinite loop while validating ' + dateObject.obj + '.'
-            }
+            }*/
 
 
             // If we’ve looped into the next/prev month with a large interval, return to the original date and flatten the interval.
@@ -4493,6 +4642,8 @@ DatePicker.prototype.nodes = function( isOpen ) {
                     })
                 )
             ) //endreturn
+
+        // Materialize modified
         })( ( settings.showWeekdaysFull ? settings.weekdaysFull : settings.weekdaysLetter ).slice( 0 ), settings.weekdaysFull.slice( 0 ) ), //tableHead
 
 
@@ -4521,11 +4672,12 @@ DatePicker.prototype.nodes = function( isOpen ) {
 
 
         // Create the month label.
+        //Materialize modified
         createMonthLabel = function(override) {
 
             var monthsCollection = settings.showMonthsShort ? settings.monthsShort : settings.monthsFull
-            
-//            use override
+
+             // Materialize modified
             if (override == "short_months") {
               monthsCollection = settings.monthsShort;
             }
@@ -4565,7 +4717,8 @@ DatePicker.prototype.nodes = function( isOpen ) {
                     'title="' + settings.labelMonthSelect + '"'
                 )
             }
-            // Return materialize raw override
+
+            // Materialize modified
             if (override == "short_months")
                 return _.node( 'div', monthsCollection[ viewsetObject.month ] )
 
@@ -4575,6 +4728,7 @@ DatePicker.prototype.nodes = function( isOpen ) {
 
 
         // Create the year label.
+        // Materialize modified
         createYearLabel = function(override) {
 
             var focusedYear = viewsetObject.year,
@@ -4611,6 +4765,7 @@ DatePicker.prototype.nodes = function( isOpen ) {
                     highestYear = maxYear
                 }
 
+
                 return _.node( 'select',
                     _.group({
                         min: lowestYear,
@@ -4634,32 +4789,35 @@ DatePicker.prototype.nodes = function( isOpen ) {
                 )
             }
 
-            // If materialize override then
+            // Materialize modified
             if (override == "raw")
                 return _.node( 'div', focusedYear )
+
             // Otherwise just return the year focused
             return _.node( 'div', focusedYear, settings.klass.year )
         } //createYearLabel
 
-    createDayLabel = function() {
-        if (selectedObject != null)
-            return _.node( 'div', selectedObject.date)
-        else return _.node( 'div', nowObject.date)
-    }
 
-    createWeekdayLabel = function() {
-        var display_day;
-        
-        if (selectedObject != null)
-            display_day = selectedObject.day;
-        else
-            display_day = nowObject.day;
-        var weekday = settings.weekdaysFull[ display_day ]
-        return weekday
-    }
+        // Materialize modified
+        createDayLabel = function() {
+                if (selectedObject != null)
+                    return _.node( 'div', selectedObject.date)
+                else return _.node( 'div', nowObject.date)
+            }
+        createWeekdayLabel = function() {
+            var display_day;
 
-    // Create and return the entire calendar. This contains the HTML elements
-    return _.node(
+            if (selectedObject != null)
+                display_day = selectedObject.day;
+            else
+                display_day = nowObject.day;
+            var weekday = settings.weekdaysFull[ display_day ]
+            return weekday
+        }
+
+
+    // Create and return the entire calendar.
+return _.node(
         // Date presentation View
         'div',
             _.node(
@@ -4668,7 +4826,7 @@ DatePicker.prototype.nodes = function( isOpen ) {
                 "picker__weekday-display"
             )+
             _.node(
-                // Div for short Month 
+                // Div for short Month
                 'div',
                 createMonthLabel("short_months"),
                 settings.klass.month_display
@@ -4721,22 +4879,22 @@ DatePicker.prototype.nodes = function( isOpen ) {
                                 // Convert the time date from a relative date to a target date.
                                 targetDate = calendar.create([ viewsetObject.year, viewsetObject.month, targetDate + ( settings.firstDay ? 1 : 0 ) ])
 
-                                var isToday = isLocalDateSame(nowObject.obj, targetDate.obj),
-                                    isSelected = selectedObject && isLocalDateSame(selectedObject.obj, targetDate.obj),
-                                    isHighlighted = highlightedObject && isLocalDateSame(highlightedObject.obj, targetDate.obj),
-                                    isDisabled = disabledCollection && calendar.disabled( targetDate ) || isLocalDateLessThan(targetDate, minLimitObject) || isLocalDateGreaterThan(targetDate, maxLimitObject)
+                                var isSelected = selectedObject && selectedObject.pick == targetDate.pick,
+                                    isHighlighted = highlightedObject && highlightedObject.pick == targetDate.pick,
+                                    isDisabled = disabledCollection && calendar.disabled( targetDate ) || targetDate.pick < minLimitObject.pick || targetDate.pick > maxLimitObject.pick,
+                                    formattedDate = _.trigger( calendar.formats.toString, calendar, [ settings.format, targetDate ] )
 
                                 return [
                                     _.node(
                                         'div',
-                                        targetDate.obj.getUTCDate(),
+                                        targetDate.date,
                                         (function( klasses ) {
 
                                             // Add the `infocus` or `outfocus` classes based on month in view.
                                             klasses.push( viewsetObject.month == targetDate.month ? settings.klass.infocus : settings.klass.outfocus )
 
                                             // Add the `today` class if needed.
-                                            if ( isToday ) {
+                                            if ( nowObject.pick == targetDate.pick ) {
                                                 klasses.push( settings.klass.now )
                                             }
 
@@ -4759,11 +4917,8 @@ DatePicker.prototype.nodes = function( isOpen ) {
                                         })([ settings.klass.day ]),
                                         'data-pick=' + targetDate.pick + ' ' + _.ariaAttr({
                                             role: 'gridcell',
-                                            selected: isSelected && calendar.$node.val() === _.trigger(
-                                                    calendar.formats.toString,
-                                                    calendar,
-                                                    [ settings.format, targetDate ]
-                                                ) ? true : null,
+                                            label: formattedDate,
+                                            selected: isSelected && calendar.$node.val() === formattedDate ? true : null,
                                             activedescendant: isHighlighted ? true : null,
                                             disabled: isDisabled ? true : null
                                         })
@@ -4783,11 +4938,10 @@ DatePicker.prototype.nodes = function( isOpen ) {
             controls: calendar.$node[0].id,
             readonly: true
         })
-    ) 
-    
-    , settings.klass.calendar_container) // end calendar 
+    )
+    , settings.klass.calendar_container) // end calendar
 
-        +
+     +
 
     // * For Firefox forms to submit, make sure to set the buttons’ `type` attributes as “button”.
     _.node(
@@ -4796,10 +4950,10 @@ DatePicker.prototype.nodes = function( isOpen ) {
             'type=button data-pick=' + nowObject.pick +
             ( isOpen && !calendar.disabled(nowObject) ? '' : ' disabled' ) + ' ' +
             _.ariaAttr({ controls: calendar.$node[0].id }) ) +
-        // _.node( 'button', settings.clear, settings.klass.buttonClear,
-        //     'type=button data-clear=1' +
-        //     ( isOpen ? '' : ' disabled' ) + ' ' +
-        //     _.ariaAttr({ controls: calendar.$node[0].id }) ) +
+        _.node( 'button', settings.clear, "btn-flat picker__clear",
+            'type=button data-clear=1' +
+            ( isOpen ? '' : ' disabled' ) + ' ' +
+            _.ariaAttr({ controls: calendar.$node[0].id }) ) +
         _.node('button', settings.close, "btn-flat picker__close",
             'type=button data-close=true ' +
             ( isOpen ? '' : ' disabled' ) + ' ' +
@@ -4832,7 +4986,7 @@ DatePicker.defaults = (function( prefix ) {
         weekdaysFull: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
         weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 
-        // Materialize Added
+        // Materialize modified
         weekdaysLetter: [ 'S', 'M', 'T', 'W', 'T', 'F', 'S' ],
 
         // Today and clear
@@ -4850,6 +5004,7 @@ DatePicker.defaults = (function( prefix ) {
 
             header: prefix + 'header',
 
+
             // Materialize Added klasses
             date_display: prefix + 'date-display',
             day_display: prefix + 'day-display',
@@ -4857,6 +5012,8 @@ DatePicker.defaults = (function( prefix ) {
             year_display: prefix + 'year-display',
             calendar_container: prefix + 'calendar-container',
             // end
+
+
 
             navPrev: prefix + 'nav--prev',
             navNext: prefix + 'nav--next',
@@ -4898,6 +5055,5 @@ Picker.extend( 'pickadate', DatePicker )
 
 
 }));
-
 
 

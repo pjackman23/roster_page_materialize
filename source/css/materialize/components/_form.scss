@@ -20,6 +20,8 @@ label {
 .input-field {
   position: relative;
 
+  padding-right: 1rem;
+
   label {
     color: $border-color;
     position: absolute;
@@ -69,11 +71,13 @@ label {
 
     &.active { color: $highlight-color; }
   }
-  .prefix ~ input {
+  .prefix ~ input,
+  .prefix ~ textarea {
     margin-left: 3rem;
     width: 92%;
     width: calc(100% - 3rem);
   }
+  .prefix ~ textarea { padding-top: .8rem; }
   .prefix ~ label { margin-left: 3rem; }
 
   @media #{$medium-and-down} {
@@ -101,9 +105,11 @@ textarea {
   border-bottom: 1px solid $border-color;
   outline: none;
   height: 3rem;
+  line-height: 3rem;
   width: 100%;
   font-size: 1rem;
-  margin: 0 0 15px 0;
+  font-weight: 500;
+  margin: 0 1rem 0 0;
   padding: 0;
   @include box-shadow(none);
   @include box-sizing(content-box);
@@ -115,8 +121,8 @@ input[type=password]:focus,
 input[type=email]:focus,
 input[type=date]:focus,
 textarea:focus {
-  border-bottom: 1px solid $highlight-color;
-  @include box-shadow(0 1px 0 0 $highlight-color);
+  border-bottom: 1px solid $button-color;
+  //@include box-shadow(0 1px 0 0 $highlight-color);
 }
 
 textarea {
@@ -136,7 +142,7 @@ textarea {
 
 
 /***************
-  Radio Buttons 
+  Radio Buttons
 ***************/
 
 /* Remove default Radio Buttons */
@@ -147,7 +153,7 @@ textarea {
 }
 
 [type="radio"]:not(:checked) + label,
-[type="radio"]:checked + label {  
+[type="radio"]:checked + label {
   position: relative;
   padding-left: 35px;
   cursor: pointer;
@@ -186,7 +192,7 @@ textarea {
   border-radius: 50%;
   border: 2px solid $radio-border;
   z-index: -1;
-  
+
   @include transform(scale(0));
 }
 
@@ -231,7 +237,7 @@ textarea {
 
 
 /***************
-   Checkboxes 
+   Checkboxes
 ***************/
 
 /* CUSTOM CSS CHECKBOXES */
@@ -250,7 +256,7 @@ form p {
   left: -9999px;
 }
 [type="checkbox"]:not(:checked) + label,
-[type="checkbox"]:checked + label {  
+[type="checkbox"]:checked + label {
   position: relative;
   padding-left: 35px;
   cursor: pointer;
@@ -294,8 +300,7 @@ form p {
   @include transform(rotateZ(40deg));
   -webkit-backface-visibility: hidden;
 
-  -webkit-transform-origin: 20% 40%;
-  transform-origin: 100% 100%;
+  @include transform-origin(100% 100%);
 }
 
 /* disabled checkbox */
@@ -319,13 +324,12 @@ form p {
 
 
 /***************
-  Select Field 
+  Select Field
 ***************/
 
 .select-wrapper span.select-dropdown {
   position: relative;
   cursor: pointer;
-  color: #444;
   background-color: transparent;
   border: none;
   border-bottom: 1px solid $border-color;
@@ -334,10 +338,13 @@ form p {
   line-height: 3rem;
   width: 100%;
   font-size: 1rem;
-  margin: 0 0 15px 0;
+  margin: 1px 0 0 0;
   padding: 0;
   display: block;
   position: relative;
+
+  font-weight: 400;
+  color: rgba(color("shades", "black"), 0.54);
 
   &:after {
     position: absolute;
@@ -367,7 +374,7 @@ select:disabled {
 
 
 /***************
-      Range 
+      Range
 ***************/
 
 .range-field {
@@ -459,7 +466,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 // FireFox
 input[type=range]{
   /* fix for FF unable to apply focus style bug  */
-  border: 1px solid white; 
+  border: 1px solid white;
 
   /*required for proper track sizing in FF*/
 }
@@ -492,10 +499,10 @@ input[type=range]:focus::-moz-range-track {
 // IE 10+
 input[type=range]::-ms-track {
   height: 3px;
-  
+
   /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
   background: transparent;
-  
+
   /*leave room for the larger thumb to overflow with a transparent border */
   border-color: transparent;
   border-width: 6px 0;

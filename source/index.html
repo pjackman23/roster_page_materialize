@@ -12,39 +12,371 @@
         <link rel="stylesheet" href="css/materialize.css">
         <link rel="stylesheet" href="css/main.css">
 
-        <link rel="shortcut icon" href="img/favicon.ico"/>
+        <link rel="shortcut icon" href="img/favicon.ico">
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
-    <body id="body">
-        <nav>
-            <div class="nav-wrapper row orange fixed">
-                <div class="col s10 offset-s1">
-                        <div class="col s3 valign-wrapper">
-                            <a href="#"><i class="mdi-navigation-menu circle waves-effect"></i></a>
-                            <h5>Manage Roster</h5>
-                        </div>
-                        <div class="col s2 valign-wrapper">
-                            
-                        </div>
 
+    <body id="body">
+
+        <!-- NAV -->
+        <nav>
+            <div class="nav-wrapper orange darken-3">
+
+                <div class="row nav-top">
+                    <div class="nav-icons-left col s2">
+                        <a id="menu-a" class="icon-a waves-effect side-nav-trigger" href="#" data-activates='slide-out'><i class="mdi-navigation-menu"></i></a>
+                    </div>
+                    <div class="nav-icons-right col s6 offset-s4">
+                        <a id="team-a" class="icon-a waves-effect dropdown-button" href="#" data-activates='dropdown-team'><i class="mdi-social-group"></i></a>
+                        <ul id='dropdown-team' class='dropdown-content'>
+                            <li><a id="boys-team" href="#!">Boys' Varsity Soccer</a></li>
+                            <li class="divider"></li>
+                            <li><a id="girls-team" href="#!">Girls' Varsity Soccer</a></li>
+                        </ul>
+                        <a id="email-a" class="icon-a waves-effect" href="#"><i class="mdi-communication-email"></i></a>
+                        <a id="settings-a" class="icon-a waves-effect modal-trigger" href="#modalSettings"><i class="mdi-action-settings"></i></a>
+                        <a id="help-a" class="icon-a waves-effect" href="#"><i class="mdi-action-help"></i></a>
+                    </div>
+                </div>
+                <div class="row nav-mid">
+                    <div class="no-pad col s10 offset-s1">
+                        <h4>Roster</h4>
+                        <h5>Santa Barbara University - Boys' Varsity Soccer</h5>
+                    </div>
+                </div>
+
+                <div class="nav-btm">
+                    <div class="">
+                        <div style="height:55.5px;">
+                            <a class="add-toggle btn-floating btn-large waves-effect waves-light"><i class="mdi-content-add"></i></a>
+                        <div>
+                    </div>
                 </div>
             </div>
         </nav>
-        
-        <div class="container">
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
-            <h1>Hey this site's structure is setup now! Testing!</h1>
+
+        <ul id="slide-out" class="side-nav full">
+            <li><img src="img/hudl.png" style="width: 150px;"></img></li>
+            <li><a href="#!">Home</a></li>
+            <li><a href="#!">Overview</a></li>
+            <li class="no-padding">
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Video</div>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#!">Library</a></li>
+                                <li><a href="#!">Manage Library</a></li>
+                                <li><a href="#!">Manage Storage</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#!">Highlights</a></li>
+            <li class="no-padding">
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Team</div>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="#!">Roster</a></li>
+                                <li><a href="#!">Coaches</a></li>
+                                <li><a href="#!">Groups</a></li>
+                                <li><a href="#!">Etc.</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="#!">Exchanges</a></li>
+        </ul>
+
+        <!-- MODALS -->
+        <div id="modalSettings" class="modal">
+            <h4>Settings</h4>
+            <p>Settings</p>
+            <a href="#" class="waves-effect waves-light-blue btn-flat modal-close">SAVE</a>
+            <a href="#" class="waves-effect waves-light-blue btn-flat modal-close">CANCEL</a>
         </div>
+
+        <div class="collapsible-wrapper">
+            <ul class="collapsible">
+                <li>
+                    <div id="hidden-collapse" class="row collapsible-header waves-effect no-height">
+                    </div>
+                    <div class="collapsible-body">
+                        <div class="row">
+                            <div class="col s11 offset-s1 details-text border-btm"><strong>Add Athlete<strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Name</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="fname" placeholder="First">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="lname" placeholder="Last">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Contact</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="home" placeholder="Home #">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="cell" placeholder="Cell #">
+                            </div>
+                            <select class="col s2">
+                                <option value="1" disabled selected>Cell Carrier</option>
+                                <option value="2">AT&T</option>
+                                <option value="3">Sprint</option>
+                                <option value="4">T-Mobile</option>
+                                <option value="5">Verizon</option>
+                            </select>
+                            <div class="input-field col s2">
+                                <input type="text" name="email" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Address</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="street" placeholder="Street">
+                            </div>
+                            <div class="input-field no-value col s2">
+                                <input type="text" name="city" placeholder="City">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="state" placeholder="State">
+                            </div>
+                            <div class="input-field no-value col s2">
+                                <input type="text" name="zip" placeholder="ZIP">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Guardian</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="gfname" placeholder="First">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="glname" placeholder="Last">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="phone" placeholder="Phone #">
+                            </div>
+                        </div>
+                        <div class="row no-height">
+                            <div class="col s2 offset-s10 no-height">
+                                <div class="upload-spacer">
+                                    <div class="big-img-wrapper no-height"><img src="img/person.jpg"></img></div>
+                                    <div class="no-height"><a class="waves-effect waves-light btn tooltipped" data-position="left" data-tooltip="This would allow a user to upload an athlete image.">UPLOAD</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Other</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="jersey" placeholder="Jersey #">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="grad" placeholder="Grad Year">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="height" placeholder="Height">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="weight" placeholder="Weight">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s9 offset-s1">
+                                <input type="text" name="comments" placeholder="Additional Comments">
+                            </div>
+                        </div>
+                        <div class="row details-btm">
+                            <div class="col s4 offset-s8">
+                                <div class="float-right margin-right"><a class="add-toggle waves-effect waves-light-blue btn-flat tooltipped" data-position="left" data-tooltip="This would save a new athlete.">SAVE</a></div>
+                                <div class="float-right"><a class="add-toggle waves-effect waves-light-blue btn-flat tooltipped" data-position="left" data-tooltip="This would cancel adding a new athlete.">CANCEL</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="collapsible-wrapper">
+            <ul class="collapsible">
+                <li>
+                    <div class="row collapsible-titles">
+                        <div class="col s3">Athlete</div>
+                        <div class="col s2">Vitals</div>
+                        <div class="col s2">Video Activity</div>
+                        <div class="col s2">Last Online</div>
+                        <div class="col s2"></div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapsible-header waves-effect">
+                        <div class="col s1 img-wrapper"><img src="img/gus.jpg"></img></div>
+                        <div class="col s3">#22 - SO (2017)<br><strong>Guster, Burton</strong></div>
+                        <div class="col s1">5' 11"<br>175 lbs.</div>
+                        <div class="col s1"><i class="mdi-alert-error float-right hidden-warning guster-warning"></i></div>
+                        <div class="col s2">288 clips<br>6h 33m</div>
+                        <div class="col s2">01-12-15</div>
+                        <div class="col s2 icon-wrapper"><i class="mdi-navigation-more-vert"></i></div>
+                    </div>
+                    <div class="collapsible-body">
+                        <div class="row">
+                            <div class="col s11 offset-s1 details-text border-btm"><strong>Details<strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Name</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="fname" placeholder="First" value="Burton">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="lname" placeholder="Last" value="Guster">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Contact</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="home" placeholder="Home #">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="cell" placeholder="Cell #">
+                            </div>
+                            <select class="col s2">
+                                <option value="1" disabled selected>Cell Carrier</option>
+                                <option value="2">AT&T</option>
+                                <option value="3">Sprint</option>
+                                <option value="4">T-Mobile</option>
+                                <option value="5">Verizon</option>
+                            </select>
+                            <div class="input-field col s2">
+                                <input type="text" name="email" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Address</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="street" placeholder="Street">
+                            </div>
+                            <div class="input-field no-value col s2">
+                                <input type="text" name="city" placeholder="City">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="state" placeholder="State">
+                            </div>
+                            <div class="input-field no-value col s2">
+                                <input type="text" name="zip" placeholder="ZIP">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Guardian</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="gfname" placeholder="First">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="glname" placeholder="Last">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="phone" placeholder="Phone #">
+                            </div>
+                        </div>
+                        <div class="row no-height">
+                            <div class="col s2 offset-s10 no-height">
+                                <div class="upload-spacer">
+                                    <div class="big-img-wrapper no-height"><img src="img/gus.jpg"></img></div>
+                                    <div class="no-height"><a class="waves-effect waves-light btn tooltipped" data-position="left" data-tooltip="This would allow a user to upload an athlete image.">UPLOAD</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s1 offset-s1 secondary-text">Other</div>
+                            <div class="input-field col s2">
+                                <input type="text" name="jersey" placeholder="Jersey #" value="22">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="grad" placeholder="Grad Year" value="2017">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="height" placeholder="Height" value="5' 11&quot;">
+                            </div>
+                            <div class="input-field col s2">
+                                <input type="text" name="weight" placeholder="Weight" value="175 lbs.">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s9 offset-s1">
+                                <input type="text" name="comments" placeholder="Additional Comments">
+                            </div>
+                        </div>
+                        <div class="row details-btm">
+                            <div class="col s4 offset-s1">
+                                <div class="float-left"><a class="waves-effect waves-red btn-flat warning tooltipped" data-position="right" data-tooltip="This would remove the athlete from this team.">DELETE</a></div>
+                                <div class="float-left"><a class="waves-effect waves-red btn-flat warning tooltipped" data-position="right" data-tooltip="This would disable the athlete for this team.">DISABLE</a></div>
+                            </div>
+                            <div class="col s4 offset-s3">
+                                <div class="float-right margin-right"><a class="waves-effect waves-light-blue btn-flat tooltipped" data-position="left" data-tooltip="This would save athlete edits.">SAVE</a></div>
+                                <div class="float-right"><a class="waves-effect waves-light-blue btn-flat tooltipped" data-position="left" data-tooltip="This would cancel athlete edits.">CANCEL</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="row collapsible-header waves-effect">
+                        <div class="col s1 img-wrapper"><img src="img/carlton.jpg"></img></div>
+                        <div class="col s3">#30 - JR (2016)<br><strong>Lassiter, Carlton</strong></div>
+                        <div class="col s1">6' 2"<br>165 lbs.</div>
+                        <div class="col s1"><i class="mdi-alert-error float-right hidden-warning carlton-warning"></i></div>
+                        <div class="col s2">124 clips<br>2h 37m</div>
+                        <div class="col s2">01-12-15</div>
+                        <div class="col s2 icon-wrapper"><i class="mdi-navigation-more-vert"></i></div>
+                    </div>
+                    <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+                </li>
+                <li>
+                    <div class="row collapsible-header waves-effect">
+                        <div class="col s1 img-wrapper"><img src="img/shawn.jpg"></img></div>
+                        <div class="col s3">#1 - SO (2017)<br><strong>Spencer, Shawn</strong></div>
+                        <div class="col s1">6' 0"<br>180 lbs.</div>
+                        <div class="col s1"><i class="mdi-alert-error float-right hidden-warning shawn-warning"></i></div>
+                        <div class="col s2">0 clips<br>0h 0m</div>
+                        <div class="col s2">04-12-13</div>
+                        <div class="col s2 icon-wrapper"><i class="mdi-navigation-more-vert"></i></div>
+                    </div>
+                    <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+                </li>
+                <li>
+                    <div class="row collapsible-header waves-effect">
+                        <div class="col s1 img-wrapper"><img src="img/woody.jpg"></img></div>
+                        <div class="col s3">#11 - SR (2015)<br><strong>Strode, Woodrow</strong></div>
+                        <div class="col s1">6' 0"<br>195 lbs.</div>
+                        <div class="col s1"><i class="mdi-alert-error float-right hidden-warning woody-warning"></i></div>
+                        <div class="col s2">57 clips<br>1h 3m</div>
+                        <div class="col s2">01-07-15</div>
+                        <div class="col s2 icon-wrapper"><i class="mdi-navigation-more-vert"></i></div>
+                    </div>
+                    <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+                </li>
+                <li>
+                    <div class="row collapsible-header waves-effect">
+                        <div class="col s1 img-wrapper"><img src="img/eshawn.jpg"></img></div>
+                        <div class="col s3">#0 - SO (2017)<br><strong>Spencer, Evil Shawn</strong></div>
+                        <div class="col s1">6' 0"<br>180 lbs.</div>
+                        <div class="col s1"><i class="mdi-alert-error float-right hidden-warning eshawn-warning"></i></div>
+                        <div class="col s2">17 clips<br>0h 9m</div>
+                        <div class="col s2">01-06-14</div>
+                        <div class="col s2 icon-wrapper"><i class="mdi-navigation-more-vert"></i></div>
+                    </div>
+                    <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+                </li>
+            </ul>
+        </div>
+        <footer>
+            &copy; Patrick Jackman 2015
+        </footer>
         
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')</script>

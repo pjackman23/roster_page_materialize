@@ -1,16 +1,14 @@
-$collapsible-height: 3rem;
-$collapsible-header-color: #fff;
-$collapsible-border-color: #ddd;
-
-
-ul.collapsible {
-  border-top: 1px solid $collapsible-border-color;
-  border-right: 1px solid $collapsible-border-color;
-  border-left: 1px solid $collapsible-border-color;
-  @extend .z-depth-1;
+.collapsible {
+  margin: 0;
+  
+  &:not(.hidden) {
+    @extend .z-depth-1;
+  }
+  position: relative;
+  z-index: 0;
 
   li {
-    @include transition(.3s);
+    @include transition(.3s ease-out);
   }
 }
 
@@ -18,39 +16,41 @@ ul.collapsible {
   display: block;
   cursor: pointer;
   height: $collapsible-height;
-  line-height: $collapsible-height;
-  padding: 0 1rem;
+  //line-height: $collapsible-height;
+  padding: 0;
   background-color: $collapsible-header-color;
-  border-bottom: 1px solid $collapsible-border-color;
+  vertical-align: middle;
 
   i {
     width: 2rem;
     font-size: 1.6rem;
     line-height: $collapsible-height;
     display: block;
-    float: left;
+    float: right;
     text-align: center;
     margin-right: 1rem;
+    vertical-align: middle;
   }
 }
 
 .collapsible-body {
+  background-color: color("orange", "lighten-3");
   overflow: hidden;
   display: none;
-  border-bottom: 1px solid $collapsible-border-color;
+
   @include box-sizing(border-box);
 
   p {
     margin: 0;
-    padding: 2rem;
+    padding: 0;
   }
 }
 
-li.active .collapsible-body { 
+li.active .collapsible-body {
 
 }
 
-// sideNav collapsible styling 
+// sideNav collapsible styling
 ul.side-nav {
 
   ul.collapsible {

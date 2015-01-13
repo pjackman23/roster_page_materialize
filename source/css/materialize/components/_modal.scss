@@ -1,10 +1,10 @@
 .modal {
-  @extend .z-depth-1-half;
+  @extend .z-depth-2;
   
   display: none;
   position: fixed;
-  background-color: #eee;
-  padding: 24px;
+  background-color: #FAFAFA;
+  padding: 1.5rem;
   max-height: 70%;
   max-width: 55%;
   left: 0;
@@ -24,6 +24,11 @@
   h1,h2,h3,h4 {
     margin-top: 0;
   }
+
+  .btn-flat {
+    float: right;
+  }
+
 }
 #lean-overlay {
     position: fixed;
