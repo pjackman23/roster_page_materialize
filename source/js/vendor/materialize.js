@@ -937,7 +937,7 @@ jQuery.extend( jQuery.easing,
 
       // Defaults
       var defaults = {
-        delay: 350
+        delay: 300
       }
       options = $.extend(defaults, options);
       
@@ -2110,11 +2110,13 @@ jQuery.extend( jQuery.easing,
         options.find('li').each(function (i) {
           var $curr_select = $select;
           $(this).click(function () {
-            // Check if option element is disabled
+
             if (!$(this).hasClass('disabled')) {
+              var cur_text = $(this).text();
               $curr_select.find('option').eq(i).prop('selected', true);
-              $(".select-wrapper span.select-dropdown").css("color", "rgba(0, 0, 0, 0.87)");
-              $(".select-wrapper span.select-dropdown").css("font-weight", "500");
+              $curr_select.prev('span.select-dropdown').css("color", "rgba(0, 0, 0, 0.87)");
+              $curr_select.prev('span.select-dropdown').css("font-weight", "500");
+
               // Trigger onchange() event
               if (typeof($curr_select.context.onchange) === "function") {
                 $curr_select[0].onchange();

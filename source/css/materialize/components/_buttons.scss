@@ -43,12 +43,8 @@
   @include transition(.3s ease-out);
   cursor: pointer;
 
-  &:hover {
-    //background-color: lighten($button-color, 5%);
-    //@extend .z-depth-1-half;
-  }
   &:active {
-    @extend .z-depth-2;
+    @extend .z-depth-3;
   }
 }
 

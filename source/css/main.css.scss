@@ -1,22 +1,6 @@
 @import "bourbon/bourbon";
 @import "materialize/materialize";
 
-$near-white: #FAFAFA;
-$near-white-hover: #EDEDED;
-$light-gray: #E0E0E0;
-
-$opacity-main-b: 0.87;
-$opacity-secondary-b: 0.54;
-$opacity-hint-b: 0.26;
-
-$opacity-main-w: 1;
-$opacity-secondary-w: 0.7;
-$opacity-hint-w: 0.3;
-
-$opacity-div: 0.12;
-
-$button-width: 108px;
-
 //mixins
 @mixin vertical-align {
 	position: relative;
@@ -27,9 +11,12 @@ $button-width: 108px;
 }
 
 //core scss
+html {
+	overflow-y: scroll;
+}
 body {
-	min-width: 850px;
 	background-color: $light-gray;
+	min-width: 850px;
 }
 
 .no-pad {
@@ -86,12 +73,74 @@ body {
 	}	
 }
 
+.mdi-alert-error {
+	color: rgba(red, $opacity-secondary-b);
+}
+
+.hidden-warning {
+	visibility: hidden;
+}
+
+
+
+.details-text {
+	line-height: $collapsible-height/2;
+	height: $collapsible-height/2;
+	vertical-align: center;
+}
+
+.secondary-text {
+	@extend .details-text;
+
+	color: rgba(color("shades", "black"), $opacity-secondary-b);
+}
+
+.input-field {
+	input {
+		@include placeholder {
+			color: rgba(color("shades", "black"), $opacity-secondary-b);
+			font-weight: 400;
+		}
+	}
+}
+
+.select-wrapper {
+	@extend .col;
+	@extend .s2;
+	@extend .details-text;
+	@include padding(0px 1rem 0px 0px);
+}
+
+#dropdown-team {
+	@include margin(0px 0px 0px -150px);
+}
+
+.img-wrapper {
+	@extend .center;
+
+	img {
+		@extend .circle;
+		@include size($button-floating-size*1.5);
+
+		vertical-align: middle;
+	}
+}
+
+.big-img-wrapper {
+	@extend .img-wrapper;
+
+	img {
+		@include size($button-width);
+	}
+}
+
 //nav
 nav {
 	z-index: 2;
 
 	.nav-wrapper {
-		
+		background-color: color("orange", "darken-3");
+
 		.nav-top {
 			@include margin(0px);
 			@include padding(0.75rem 0.75rem 0px 0.75rem);
@@ -137,33 +186,6 @@ nav {
 	}
 }
 
-#dropdown-team {
-	@include margin(0px 0px 0px -150px);
-}
-
-.img-wrapper {
-	@extend .center;
-
-	img {
-		@extend .circle;
-		@include size($button-floating-size*1.5);
-
-		vertical-align: middle;
-	}
-}
-
-.big-img-wrapper {
-	@extend .img-wrapper;
-
-	img {
-		@include size($button-width);
-	}
-}
-
-.hidden-warning {
-	visibility: hidden;
-}
-
 .collapsible-wrapper {
 	@extend .z-depth-1;
 
@@ -178,12 +200,11 @@ nav {
 
 	.collapsible-titles {
 		@extend .border-btm;
-		@include margin(0px 0px 0px 8.3333333333333%);
+		@include margin(0px);
 
 		height: $collapsible-height/2;
 		line-height: $collapsible-height/2;
 		position: relative;
-		width: 100%;
 		z-index: 0;
 
 		div {
@@ -192,7 +213,7 @@ nav {
 	}
 
 	.collapsible-header {
-		@include transition(.5s ease-out);
+		@include transition(0.3s ease-out);
 
 		position: relative;
 		z-index: 2;
@@ -232,33 +253,6 @@ nav {
 	}
 }
 
-.details-text {
-	line-height: $collapsible-height/2;
-	height: $collapsible-height/2;
-	vertical-align: center;
-}
-
-.secondary-text {
-	@extend .details-text;
-	color: rgba(color("shades", "black"), $opacity-secondary-b);
-}
-
-.input-field {
-	input {
-		@include placeholder {
-			color: rgba(color("shades", "black"), $opacity-secondary-b);
-			font-weight: 400;
-		}
-	}
-}
-
-.select-wrapper {
-	@extend .col;
-	@extend .s2;
-	@extend .details-text;
-	@include padding(0px 1rem 0px 0px);
-}
-
 .details-btm {
 	margin-top: 2.5rem;
 }
@@ -273,4 +267,13 @@ nav {
 	img {
 		@include margin(-12rem null null null);
 	}
+}
+
+#copyright {
+	@extend	.border-top;
+	@include padding(0px 1.5rem);
+
+	bottom: 0px;
+	color: rgba(color("shades", "black"), $opacity-hint-b);
+	position: absolute;
 }

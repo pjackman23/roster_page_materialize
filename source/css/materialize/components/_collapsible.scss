@@ -16,7 +16,6 @@
   display: block;
   cursor: pointer;
   height: $collapsible-height;
-  //line-height: $collapsible-height;
   padding: 0;
   background-color: $collapsible-header-color;
   vertical-align: middle;
@@ -46,10 +45,6 @@
   }
 }
 
-li.active .collapsible-body {
-
-}
-
 // sideNav collapsible styling
 ul.side-nav {
 
@@ -60,21 +55,36 @@ ul.side-nav {
     li { padding: 0; }
   }
 
+  .active {
+    .collapsible-header {
+      @extend .z-depth-1;
+
+      position: relative;
+      z-index: 2;
+    }
+    .collapsible-body {
+      position: relative;
+      z-index: 0;
+    }
+  }
+
   .collapsible-header {
     background-color: transparent;
     border: none;
+    font-weight: 500;
     line-height: inherit;
     height: inherit;
-    margin: 0 1rem;
 
     i { line-height: inherit; }
   }
 
   .collapsible-body {
     border: 0;
-    background-color: #FFF;
+    background-color: color("orange", "lighten-3");
+    font-weight: 400;
+    color: rgba(0,0,0, 0.54);
 
-    li a { margin: 0 1rem 0 2rem; }
+    li a { margin: 0 0 0 1.5rem; }
   }
 
 }

@@ -140,6 +140,25 @@ textarea {
   padding-top: 1.2rem; /* prevents text jump on Enter keypress */
 }
 
+#modal-settings {
+  .input-field {
+    padding: 0px;
+    margin-left: 150px;
+
+    input {
+      margin: 0px;
+      width: 200px;
+      float: right;
+    }
+
+    .select-wrapper {
+      padding-left: 1rem;
+      width: 100px;
+    }
+  }
+
+
+}
 
 /***************
   Radio Buttons
@@ -321,8 +340,6 @@ form p {
   border-color: $disabled-color;
 }
 
-
-
 /***************
   Select Field
 ***************/
@@ -355,9 +372,17 @@ form p {
   }
 }
 
+.modal {
+  .select-wrapper {
+    width: 300px;
+    float: right;
+    padding: 0px;
+  }
+
+}
+
 select { display: none; }
 select.browser-default { display: block; }
-
 
 // Disabled styles
 select:disabled {
@@ -429,12 +454,9 @@ input[type=range] + .thumb {
   }
 }
 
-
 input[type=range]:focus {
   outline: none;
 }
-
-
 
 // WebKit
 input[type=range]{

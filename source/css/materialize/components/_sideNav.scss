@@ -23,13 +23,13 @@
 
 
     li {
+      color: rgba(0,0,0, 0.87);
       float: none;
-      padding: 0 15px;
       width: 240px;
-      &:hover, &.active { background-color: #ddd; }
-    }
-    a {
-      color: #444;
+
+      &:not(.no-hover) {
+        &:hover { background-color: #EDEDED; }
+      }
     }
   }
 
@@ -41,12 +41,13 @@ ul.side-nav.fixed {
   position: fixed;
   width: $sidenav-width;
   left: -1 * ($sidenav-width + 10);
+  font-weight: 500;
   top: 0;
   bottom: 0;
   margin: 0;
-  background-color: #FFF;
+  background-color: #FAFAFA;
   z-index: 999;
-  @extend .z-depth-1;
+  @extend .z-depth-2;
 
   will-change: left;
 
@@ -59,22 +60,42 @@ ul.side-nav.fixed {
 
   .collapsible{
     margin: 0;
+
+    .collapsible-header {
+      padding: 0px 1.5rem;
+    }
   }
 
   li {
     float: none;
-    line-height: 64px;
-    padding: 0 15px;
+    line-height: 3rem;
     width: $sidenav-width;
 
-    @include transition(background-color 0s);
+    @include transition(0.3s ease-out);
 
-    &:hover, &.active { background-color: #ddd; }
+    &:not(.no-hover), .collapsible-header {
+      &:hover { background-color: #EDEDED; }
+      &:active { @extend .z-depth-3; }
+    }
+
+    .collapsible-body li {
+        &:hover { background-color: $orange-hover; }
+      }
   }
   a {
     display: block;
-    padding: 0 15px;
-    color: #444;
+    padding: 0 1.5rem;
+    color: rgba(0,0,0, 0.87);
+  }
+
+  .nav-logo-wrapper {
+
+    border-bottom: 1px solid rgba(0,0,0, 0.12);
+
+    img {
+      margin: 1.5rem;
+      vertical-align: middle;
+    }
   }
 }
 
